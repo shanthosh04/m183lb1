@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const newTweetInput = document.getElementById("new-tweet");
   const postTweetButton = document.getElementById("post-tweet");
   const logoutButton = document.getElementById("logout");
+  
 
   const user = JSON.parse(localStorage.getItem("user"));
   if (!user) {

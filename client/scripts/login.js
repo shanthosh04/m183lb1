@@ -3,10 +3,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const passwordInput = document.getElementById("password");
   const loginButton = document.getElementById("login");
   const errorText = document.getElementById("error");
+  const resultText = document.getElementById("resultText");
+
 
   loginButton.addEventListener("click", async () => {
     const username = usernameInput.value;
     const password = passwordInput.value;
+    if (!password || password.length < 6) {
+      resultText.innerHTML = "Password must be at least 6 characters.";
+      return;
+      } else {
+        resultText.innerHTML = "Password or Username is invalid";
+      }
     const response = await fetch("/api/login", {
       method: "POST",
       headers: {
