@@ -2,7 +2,7 @@ const express = require("express");
 const http = require("http");
 const { initializeAPI } = require("./api");
 const { rateLimit } = require("express-rate-limit");
-
+const bcrypt = require('bcrypt');
 
 const app = express();
 app.use(express.json());
