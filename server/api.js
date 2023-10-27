@@ -29,14 +29,14 @@ const getFeed = async (req, res) => {
   res.json(tweets);
 };
 
-function containsHTML(str) {
-  const htmlPattern = /<[^>]*>/;
-  return htmlPattern.test(str);
+function containsInjection(str) {
+  const htmlAndSqlPattern = /<[^>]*>|(\bSELECT|INSERT|UPDATE|DELETE|FROM|WHERE|DROP|ALTER|CREATE|TABLE|script)\b/i;
+  return htmlAndSqlPattern.test(str);
 }
  
 const postTweet = async (req, res) => {
   const { username, timestamp, text } = req.body;
-  if (containsHTML(text) === true) {
+  if (containsInjection(text) === true) {
  
     res.json({ status: "ok" });
   } else {
