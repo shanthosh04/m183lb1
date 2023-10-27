@@ -1,27 +1,21 @@
 const sqlite3 = require("sqlite3").verbose();
 const bcrypt = require("bcrypt");
-const saltRounds = 10; // Anzahl der Salz-Runden für bcrypt
+const saltRounds = 10; 
 
-const tweetsTableExists =
-  "SELECT name FROM sqlite_master WHERE type='table' AND name='tweets'";
+const tweetsTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='tweets'";
 const createTweetsTable = `CREATE TABLE tweets (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   username TEXT,
   timestamp TEXT,
   text TEXT
 )`;
-const usersTableExists =
-  "SELECT name FROM sqlite_master WHERE type='table' AND name='users'";
+
+const usersTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='users'";
 const createUsersTable = `CREATE TABLE users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   username TEXT,
   password TEXT
 )`;
-const seedUsersTable = `INSERT INTO users (username, password) VALUES
-  ('switzerchees', '${bcrypt.hashSync('123456', 10)}'),
-  ('john', '${bcrypt.hashSync('123456', 10)}'),
-  ('jane', '${bcrypt.hashSync('123456', 10)}')
-`;
 
 const initializeDatabase = async () => {
   const db = new sqlite3.Database("./minitwitter.db");
@@ -33,16 +27,14 @@ const initializeDatabase = async () => {
         await db.run(createTweetsTable);
       }
     });
+
     db.get(usersTableExists, [], async (err, row) => {
       if (err) return console.error(err.message);
       if (!row) {
         db.run(createUsersTable, [], async (err) => {
           if (err) return console.error(err.message);
-          // Jetzt Passwörter hashen und in die Datenbank einfügen
-          const hashedPasswordSwitzerchees = await bcrypt.hash('123456', saltRounds);
-          const hashedPasswordJohn = await bcrypt.hash('123456', saltRounds);
-          const hashedPasswordJane = await bcrypt.hash('123456', saltRounds);
-          await db.run(seedUsersTable, [hashedPasswordSwitzerchees, hashedPasswordJohn, hashedPasswordJane]);
+          const hashedPasswordMinitwitter = await bcrypt.hash('minitwitter', saltRounds);
+          await db.run("INSERT INTO users (username, password) VALUES (?, ?)", ['minitwitter', hashedPasswordMinitwitter]);
         });
       }
     });
@@ -51,18 +43,18 @@ const initializeDatabase = async () => {
   return db;
 };
 
-const insertDB = (db, query) => {
+const insertDB = (db, query, params) => {
   return new Promise((resolve, reject) => {
-    db.run(query, [], (err, rows) => {
+    db.run(query, params, (err) => {
       if (err) return reject(err);
-      resolve(rows);
+      resolve();
     });
   });
 };
 
-const queryDB = (db, query) => {
+const queryDB = (db, query, params) => {
   return new Promise((resolve, reject) => {
-    db.all(query, [], (err, rows) => {
+    db.all(query, params, (err, rows) => {
       if (err) return reject(err);
       resolve(rows);
     });
