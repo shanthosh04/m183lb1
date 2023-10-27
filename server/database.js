@@ -1,5 +1,6 @@
 const sqlite3 = require("sqlite3").verbose();
 const bcrypt = require("bcrypt");
+const saltRounds = 10; // Anzahl der Salz-Runden für bcrypt
 
 const tweetsTableExists =
   "SELECT name FROM sqlite_master WHERE type='table' AND name='tweets'";
@@ -37,7 +38,11 @@ const initializeDatabase = async () => {
       if (!row) {
         db.run(createUsersTable, [], async (err) => {
           if (err) return console.error(err.message);
-          db.run(seedUsersTable);
+          // Jetzt Passwörter hashen und in die Datenbank einfügen
+          const hashedPasswordSwitzerchees = await bcrypt.hash('123456', saltRounds);
+          const hashedPasswordJohn = await bcrypt.hash('123456', saltRounds);
+          const hashedPasswordJane = await bcrypt.hash('123456', saltRounds);
+          await db.run(seedUsersTable, [hashedPasswordSwitzerchees, hashedPasswordJohn, hashedPasswordJane]);
         });
       }
     });
