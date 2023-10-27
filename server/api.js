@@ -29,11 +29,21 @@ const getFeed = async (req, res) => {
   res.json(tweets);
 };
 
-const postTweet = async(req, res) => {
+function containsHTML(str) {
+  const htmlPattern = /<[^>]*>/;
+  return htmlPattern.test(str);
+}
+ 
+const postTweet = async (req, res) => {
   const { username, timestamp, text } = req.body;
-  const query = `INSERT INTO tweets (username, timestamp, text) VALUES ('${username}', '${timestamp}', '${text}')`;
-  await queryDB(db, query);
-  res.json({ status: "ok" });
+  if (containsHTML(text) === true) {
+ 
+    res.json({ status: "ok" });
+  } else {
+    const query = `INSERT INTO tweets (username, timestamp, text) VALUES ('${username}', '${timestamp}', '${text}')`;
+    await queryDB(db, query);
+    res.json({ status: "ok" });
+  }
 };
 
 const login = async (req, res) => {
