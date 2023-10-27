@@ -1,8 +1,16 @@
 const { initializeDatabase, queryDB, insertDB } = require("./database");
 const { body } = require("express-validator");
 const jwt = require('jsonwebtoken');
+const AesEncryption = require("aes-encryption");
+
 
 let db;
+const jwtSecret = "supersecret";
+const aes = new AesEncryption();
+aes.setSecretKey(
+  process.env.SECRET ||
+    "11122233344455566677788822244455555555555555555231231321313aaaff"
+);
 
 const initializeAPI = async (app) => {
   db = await initializeDatabase();
@@ -40,8 +48,8 @@ const postTweet = async (req, res) => {
  
     res.json({ status: "ok" });
   } else {
-    const query = `INSERT INTO tweets (username, timestamp, text) VALUES ('${username}', '${timestamp}', '${text}')`;
-    await queryDB(db, query);
+    const encryptedText = aes.encrypt(text);
+    const query = `INSERT INTO tweets (username, timestamp, text) VALUES ('${username}', '${timestamp}', '${encryptedText}')`;    await queryDB(db, query);
     res.json({ status: "ok" });
   }
 };
