@@ -24,13 +24,15 @@ const initializeAPI = async (app) => {
 };
 
 const getFeed = async (req, res) => {
-  const query = req.query.q;
+  const query = "SELECT * FROM tweets ORDER BY id DESC;";
   const tweets = await queryDB(db, query);
   res.json(tweets);
 };
 
-const postTweet = (req, res) => {
-  insertDB(db, req.body.query);
+const postTweet = async(req, res) => {
+  const { username, timestamp, text } = req.body;
+  const query = `INSERT INTO tweets (username, timestamp, text) VALUES ('${username}', '${timestamp}', '${text}')`;
+  await queryDB(db, query);
   res.json({ status: "ok" });
 };
 
