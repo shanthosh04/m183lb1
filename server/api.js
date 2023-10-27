@@ -41,8 +41,6 @@ const login = async (req, res) => {
   const query = `SELECT * FROM users WHERE username = '${username}' AND password = '${password}'`;
   const user = await queryDB(db, query);
 
-  
-
   if (user.length === 1) {
     const username = user[0].username;
 
@@ -54,9 +52,10 @@ const login = async (req, res) => {
       },
       jwtSecret
     );
+    req.log.info("User logged in successfully");
     res.json({ token });
-  
   } else {
+    req.log.error("Failed login attempt");
     res.status(401).json({ error: "Username or password invalid!" });
   }
 };
