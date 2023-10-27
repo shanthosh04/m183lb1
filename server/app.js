@@ -38,5 +38,5 @@ initializeAPI(app);
 
 const serverPort = process.env.PORT || 3000;
 server.listen(serverPort, () => {
-  req.log.info(`Express Server started on port ${serverPort}`);
+  console.log(`Express Server started on port ${serverPort}`);
 });
