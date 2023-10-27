@@ -1,8 +1,9 @@
 const { initializeDatabase, queryDB, insertDB } = require("./database");
 const { body } = require("express-validator");
- 
+const jwt = require('jsonwebtoken');
+
 let db;
- 
+
 const initializeAPI = async (app) => {
   db = await initializeDatabase();
   app.get("/api/feed", getFeed);
@@ -21,28 +22,41 @@ const initializeAPI = async (app) => {
     login
   );
 };
- 
+
 const getFeed = async (req, res) => {
   const query = req.query.q;
   const tweets = await queryDB(db, query);
   res.json(tweets);
 };
- 
+
 const postTweet = (req, res) => {
   insertDB(db, req.body.query);
   res.json({ status: "ok" });
 };
- 
+
 const login = async (req, res) => {
   const { username, password } = req.body;
   const query = `SELECT * FROM users WHERE username = '${username}' AND password = '${password}'`;
   const user = await queryDB(db, query);
- 
+
+  
+
   if (user.length === 1) {
-    res.json(user[0]);
+    const username = user[0].username;
+
+    const jwtSecret = "supersecret";
+    const token = jwt.sign(
+      {
+        exp: Math.floor(Date.now() / 1000) + 60 * 60,
+        data: username,
+      },
+      jwtSecret
+    );
+    res.json({ token });
+  
   } else {
-    res.status(200).json({ error: "Username or password invalid!" });
+    res.status(401).json({ error: "Username or password invalid!" });
   }
 };
- 
+
 module.exports = { initializeAPI };
